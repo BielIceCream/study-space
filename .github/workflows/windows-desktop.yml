@@ -1,0 +1,123 @@
+name: StudySpace Windows desktop
+
+on:
+  workflow_dispatch:
+    inputs:
+      offline_webview:
+        description: Incluir instalador offline do WebView2 (download maior)
+        type: boolean
+        default: false
+      signing_mode:
+        description: Assinatura legitima (exige editor validado e credenciais)
+        type: choice
+        options: [none, certificate, artifact]
+        default: none
+      require_defender:
+        description: Reprovar se o scanner Defender estiver indisponivel no runner
+        type: boolean
+        default: false
+      test_windows_credentials:
+        description: Testar cofre Windows real (exige sessão de logon utilizável)
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+jobs:
+  windows:
+    runs-on: windows-2022
+    timeout-minutes: 45
+    env:
+      STUDYSPACE_SIGNING_MODE: ${{ inputs.signing_mode }}
+      STUDYSPACE_PUBLISHER: ${{ vars.STUDYSPACE_PUBLISHER }}
+      STUDYSPACE_TIMESTAMP_URL: ${{ vars.STUDYSPACE_TIMESTAMP_URL }}
+      STUDYSPACE_REQUIRE_DEFENDER: ${{ inputs.require_defender && '1' || '0' }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 24.19.0
+          cache: npm
+      - name: Instalar Rust fixado
+        shell: pwsh
+        run: |
+          rustup toolchain install 1.99.0 --profile minimal
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          rustup target add x86_64-pc-windows-msvc --toolchain 1.99.0
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - run: npm ci
+      - name: Testes de persistência e pacote frontend
+        run: |
+          npm test
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          npm run desktop:tooling:test
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          npm run build
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          npm run desktop:verify
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Testes Rust sem requisitos físicos ou de sessão
+        if: '!inputs.test_windows_credentials'
+        run: node scripts/desktop/windows-build.mjs test-ci
+      - name: Testes Rust incluindo credencial Windows isolada
+        if: inputs.test_windows_credentials
+        run: npm run desktop:test
+      - run: npm run test:e2e:install
+      - name: Regressão funcional e visual em produção
+        env:
+          STUDYSPACE_E2E_PREVIEW: '1'
+        run: npm run test:e2e
+      - name: Preparar assinatura no runner quando configurada
+        if: inputs.signing_mode != 'none'
+        shell: pwsh
+        env:
+          AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+          AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
+          AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+          WINDOWS_CERTIFICATE: ${{ secrets.WINDOWS_CERTIFICATE }}
+          WINDOWS_CERTIFICATE_PASSWORD: ${{ secrets.WINDOWS_CERTIFICATE_PASSWORD }}
+          STUDYSPACE_ARTIFACT_ENDPOINT: ${{ vars.STUDYSPACE_ARTIFACT_ENDPOINT }}
+          STUDYSPACE_ARTIFACT_ACCOUNT: ${{ vars.STUDYSPACE_ARTIFACT_ACCOUNT }}
+          STUDYSPACE_ARTIFACT_PROFILE: ${{ vars.STUDYSPACE_ARTIFACT_PROFILE }}
+        run: ./scripts/desktop/prepare-ci-signing.ps1
+      - name: Gerar instalador e distribuição sem instalação
+        shell: pwsh
+        env:
+          OFFLINE_WEBVIEW: ${{ inputs.offline_webview }}
+          AZURE_CLIENT_ID: ${{ inputs.signing_mode == 'artifact' && secrets.AZURE_CLIENT_ID || '' }}
+          AZURE_CLIENT_SECRET: ${{ inputs.signing_mode == 'artifact' && secrets.AZURE_CLIENT_SECRET || '' }}
+          AZURE_TENANT_ID: ${{ inputs.signing_mode == 'artifact' && secrets.AZURE_TENANT_ID || '' }}
+        run: |
+          if ($env:OFFLINE_WEBVIEW -eq 'true') { npm run desktop:build:offline }
+          else { npm run desktop:build }
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Disponibilizar artefatos, sem publicar release
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: StudySpace-Windows-x64-${{ inputs.signing_mode == 'none' && 'unsigned' || 'signed' }}
+          path: release/windows/
+          if-no-files-found: error
+          retention-days: 14
+      - name: Remover certificados temporarios importados no runner
+        if: always() && inputs.signing_mode == 'certificate'
+        shell: pwsh
+        run: |
+          $recordPath = Join-Path $env:RUNNER_TEMP 'studyspace-signing/imported-thumbprints.txt'
+          if (Test-Path -LiteralPath $recordPath) {
+            foreach ($thumbprint in (Get-Content -LiteralPath $recordPath)) {
+              if ($thumbprint -notmatch '^[a-fA-F0-9]{40}$') { throw 'Thumbprint de limpeza invalido.' }
+              Remove-Item -LiteralPath "Cert:/CurrentUser/My/$thumbprint" -ErrorAction SilentlyContinue
+            }
+          }
+      - name: Guardar evidências de falha
+        if: failure()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: StudySpace-Windows-test-evidence
+          path: |
+            test-results/
+            .cache/windows-diagnostics/
+          if-no-files-found: ignore

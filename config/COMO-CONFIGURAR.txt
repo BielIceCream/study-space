@@ -1,0 +1,99 @@
+CONFIGURACAO DO STUDYSPACE LOCAL — MULTIPLAS IAS
+
+Abra "Editar configuracao.cmd" ou edite .env com o Bloco de Notas.
+Preencha somente as chaves dos servicos que quiser usar.
+Mantenha o nome .env (nao salve como .env.txt).
+
+PROVEDORES E VARIAVEIS
+Google Gemini       GEMINI_API_KEY       GEMINI_MODEL
+OpenAI              OPENAI_API_KEY       OPENAI_MODEL
+Groq                GROQ_API_KEY         GROQ_MODEL
+xAI / Grok          XAI_API_KEY          XAI_MODEL
+NVIDIA NIM          NVIDIA_API_KEY       NVIDIA_MODEL
+Anthropic / Claude  ANTHROPIC_API_KEY    ANTHROPIC_MODEL
+DeepSeek            DEEPSEEK_API_KEY     DEEPSEEK_MODEL
+Mistral             MISTRAL_API_KEY      MISTRAL_MODEL
+OpenRouter          OPENROUTER_API_KEY   OPENROUTER_MODEL
+Together AI         TOGETHER_API_KEY     TOGETHER_MODEL
+Fireworks AI        FIREWORKS_API_KEY    FIREWORKS_MODEL
+Cerebras            CEREBRAS_API_KEY     CEREBRAS_MODEL
+Ollama local        OLLAMA_API_KEY       OLLAMA_MODEL
+LM Studio local     LMSTUDIO_API_KEY     LMSTUDIO_MODEL
+API personalizada   CUSTOM_API_KEY       CUSTOM_MODEL
+
+EXEMPLO
+GROQ_API_KEY=cole_sua_chave_aqui
+NVIDIA_API_KEY=cole_sua_chave_aqui
+AI_PROVIDER=groq
+
+DEPOIS DE SALVAR
+1. Abra o StudySpace, feche e reabra o painel JARVIS e clique na engrenagem.
+2. Escolha "Provedor de IA". Todos aparecem, mesmo sem chave configurada.
+3. Os modelos dos provedores configurados carregam automaticamente ao abrir
+   o JARVIS. Escolha uma opcao no campo "Modelo"; nao precisa buscar um a um.
+   As listas ficam em memoria por 10 minutos. "Atualizar modelos" forca nova busca.
+4. Se a lista nao funcionar, abra "Informar ID do modelo manualmente".
+5. Clique em "Testar conexao". Cada conta precisa ter acesso ao modelo escolhido.
+
+Voce pode definir o modelo inicial no .env, ou escolher pela interface.
+A escolha salva no painel prevalece sobre AI_PROVIDER e os modelos iniciais.
+O painel guarda modelos separados por provedor. Trocar de provedor inicia
+uma nova conversa e desmarca o compartilhamento do material.
+Uma falha de API nao envia automaticamente sua conversa a outro servico.
+Se o modelo nao aceitar ferramentas, desmarque "Usar acoes JARVIS".
+Tambem e possivel usar PREFIXO_TOOLS=false no .env, por exemplo NVIDIA_TOOLS=false.
+Sem ferramentas, o modelo continua conversando, mas nao propoe acoes no app.
+Geracao de flashcards por ferramentas sempre exige confirmacao na interface.
+
+NVIDIA NIM
+Preencha NVIDIA_API_KEY e selecione NVIDIA NIM no painel. Use o ID completo
+do modelo da sua conta (incluindo o prefixo, quando houver).
+O adaptador usa a API hospedada NVIDIA; nao instala NIM nem modelos no PC.
+
+OLLAMA E LM STUDIO
+Inicie o servidor e carregue/instale um modelo usando o proprio aplicativo.
+O StudySpace nao instala esses programas nem baixa modelos automaticamente.
+Os enderecos padrao sao:
+OLLAMA_BASE_URL=http://127.0.0.1:11434/v1
+LMSTUDIO_BASE_URL=http://127.0.0.1:1234/v1
+As chaves locais sao opcionais e dependem da configuracao desses servidores.
+
+API COMPATIVEL PERSONALIZADA
+CUSTOM_BASE_URL=https://seu-servidor/v1
+CUSTOM_API_KEY=sua_chave_se_o_servidor_exigir
+CUSTOM_MODEL=id_do_modelo
+O servidor precisa implementar Chat Completions no formato OpenAI.
+Use a URL base, sem /chat/completions no final. HTTPS e obrigatorio para
+servidores externos. HTTP e permitido apenas no proprio PC.
+Chaves de um provedor nunca sao reutilizadas nos demais.
+
+MICROFONE E LEITURA EM VOZ
+LOCAL_VOICE_ENABLED=true ativa a leitura; false desativa.
+LOCAL_VOICE_ID=Microsoft Maria Desktop seleciona a voz instalada neste PC.
+LOCAL_VOICE_VOLUME=0.8 define volume inicial entre 0 e 1.
+LOCAL_VOICE_RATE=0 define velocidade de -10 (lento) a 10 (rapido).
+Use "Testar voz local" no painel. A leitura usa o Windows, sem API de voz.
+As escolhas de voz e volume ja salvas na interface prevalecem sobre os valores iniciais.
+
+A transcricao do microfone usa uma API e e separada da voz de leitura.
+TRANSCRIPTION_PROVIDER=auto usa o provedor de conversa se for Gemini, Groq
+ou OpenAI com chave configurada; caso contrario tenta as chaves configuradas
+na ordem Groq, OpenAI, Gemini. O destino aparece no painel antes de gravar.
+Nao ha troca de servico apos uma falha. Para fixar ou desativar, use:
+TRANSCRIPTION_PROVIDER=groq   (ou gemini, openai, none)
+GROQ_TRANSCRIPTION_MODEL=whisper-large-v3-turbo
+OPENAI_TRANSCRIPTION_MODEL=whisper-1
+GEMINI_TRANSCRIPTION_MODEL=   (vazio usa GEMINI_MODEL ou o modelo Gemini ativo)
+Clique no botao "Falar" para iniciar a gravacao e em "Parar gravacao" para
+finalizar antes dos 30 segundos. O microfone so grava quando acionado;
+o audio e enviado ao servico indicado. Quando faltar configuracao, o botao
+mostra "Configurar microfone" e abre a orientacao ao clicar. Se o navegador
+recusar a permissao, use o icone ao lado do endereco para liberar o microfone.
+
+ARMAZENAMENTO
+O .env guarda suas chaves em texto no computador. O servidor local le esse
+arquivo e nao devolve as chaves ao navegador, ao banco de estudos ou ao backup.
+O ZIP distribuido tem chaves vazias. A atualizacao preserva valores existentes.
+Nao envie seu .env junto de arquivos compartilhados.
+
+As referencias oficiais usadas para os adaptadores estao em PROVEDORES.md.

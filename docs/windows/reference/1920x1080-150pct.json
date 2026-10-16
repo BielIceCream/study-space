@@ -1,0 +1,13 @@
+{
+  "screen": {
+    "width": 1920,
+    "height": 1080
+  },
+  "scale": 1.5,
+  "viewport": {
+    "width": 1264,
+    "height": 640
+  },
+  "sidebarHeight": 640,
+  "sidebarOverflow": false
+}

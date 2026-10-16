@@ -1,0 +1,13 @@
+{
+  "screen": {
+    "width": 1366,
+    "height": 768
+  },
+  "scale": 1,
+  "viewport": {
+    "width": 1350,
+    "height": 688
+  },
+  "sidebarHeight": 688,
+  "sidebarOverflow": false
+}

@@ -1,0 +1,1 @@
+{"main":{"identifier":"main","description":"Permite que a janela principal intercepte o fechamento, conclua os salvamentos e feche.","local":true,"windows":["main"],"permissions":["core:event:allow-listen","core:event:allow-unlisten","core:window:allow-close"]}}

@@ -1,0 +1,44 @@
+StudySpace local 0.2.0 — verificado em 14/10/2026
+
+Origem: StudySpace_0.2.0_Codigo_Recuperacao.zip.
+Frontend compilado em modo de produção com checagem TypeScript.
+JARVIS conectado ao servidor local para configuração .env, 15 provedores e voz Windows.
+O modelo de dados de estudo foi preservado.
+
+Resultados:
+- 72 testes internos aprovados.
+- 20 cenários de uso verificados: importação, backup, JARVIS, configuração e troca de IA.
+- Importação CSV, JSON, PDF, DOCX e APKG, cartões, revisão, busca, backup,
+  restauração, acessibilidade, notas, persistência e uso entre abas exercitados.
+- Inicialização com todas as conexões externas bloqueadas: aprovada.
+- Criação e reabertura de nota nesse cenário: aprovadas, zero requisições externas.
+- 22 arquivos do frontend servidos com conteúdo idêntico ao pacote.
+- Tipos de arquivo WASM/JS, HEAD, caminhos isolados e requisições inválidas verificados.
+- Servidor escuta exclusivamente 127.0.0.1:1420.
+- Abrir novamente reutiliza o mesmo servidor; comando de encerramento verificado.
+- Runtime Node v24.19.0 incluído, assinatura OpenJS Foundation validada.
+- API key mantida no servidor; configuração pública não retorna a chave.
+- Contexto sem consentimento, ações inválidas e citações inventadas filtrados.
+- Erros do provedor ocultam o corpo e a credencial; endereços vêm do catálogo ou do .env.
+- 15 adaptadores exercitados com credenciais fictícias isoladas, modelos e propostas de cartões.
+- Formatos Gemini, Chat Completions e Anthropic Messages verificados.
+- Transcrição multipart Groq/OpenAI verificada com transporte simulado.
+- Trocar de provedor limpa histórico, sessão e consentimento de conteúdo.
+- Listas de modelos dos provedores configurados carregam automaticamente e ficam em memória.
+- Respostas atrasadas de outro provedor não substituem o modelo selecionado.
+- Botão Falar/Configurar microfone verificado com clique e permissão negada simulada.
+- Voz Windows gerou WAV válido; teste do painel funcionou com conexões externas bloqueadas.
+- A pasta config e os arquivos do runtime não são servidos ao navegador.
+
+Limites: não foram feitas chamadas reais aos provedores; o pacote contém chaves vazias.
+Os contratos das APIs foram testados com provedores simulados; a síntese de voz Windows
+e a reprodução no navegador foram exercitadas de verdade. Saída física nos
+alto-falantes e captura física de microfone não foram verificadas.
+A transcrição do microfone usa Gemini, Groq ou OpenAI, conforme configuração;
+a leitura em voz usa o Windows local. Ollama/LM Studio precisam de servidor e modelo.
+A persistência pertence ao perfil do navegador; use o backup para transferir dados.
+
+O iniciador .cmd usa o runtime oficial incluído. A tentativa de entregar um
+novo executável compilado foi bloqueada pelo Controle de Aplicativos do Windows;
+esse executável não faz parte deste pacote. Nenhuma configuração de segurança
+do Windows foi alterada.

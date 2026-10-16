@@ -1,0 +1,16 @@
+.jarvis-launch { position: fixed; right: 24px; bottom: 24px; z-index: 20; box-shadow: var(--shadow); }.jarvis-panel { position: fixed; z-index: 21; right: 24px; bottom: 24px; width: min(400px, calc(100vw - 32px)); max-height: calc(100vh - 48px); display: flex; flex-direction: column; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 16px; gap: 12px; }.jarvis-heading { display: flex; align-items: center; gap: 8px; }.jarvis-heading strong { flex: 1; }.jarvis-history { min-height: 100px; max-height: 38vh; overflow: auto; }.jarvis-turn { padding: 10px; margin-bottom: 8px; background: var(--muted-surface); border-radius: 8px; white-space: pre-wrap; overflow-wrap: anywhere; line-height: 1.7; }.jarvis-turn.user { background: var(--primary-light); }.jarvis-turn small { display: block; color: var(--muted); }.jarvis-compose { display: flex; gap: 7px; align-items: flex-end; }.jarvis-compose textarea { flex: 1; min-height: 65px; resize: vertical; }.jarvis-consent { font-size: 12px; line-height: 1.7; }.jarvis-settings { display: grid; gap: 10px; max-height: 40vh; overflow: auto; }.jarvis-settings label { display: grid; gap: 5px; }.jarvis-settings-actions { display: flex; flex-wrap: wrap; gap: 7px; }.jarvis-voice { display: flex; align-items: center; gap: 10px; font-size: 12px; }.jarvis-level { width: 50px; accent-color: var(--primary); }.jarvis-state { font-size: 12px; color: var(--muted); line-height: 1.5; }
+.jarvis-sources { margin: 0; padding-left: 18px; color: var(--muted); font-size: 12px; line-height: 1.7; max-height: 90px; overflow: auto; overflow-wrap: anywhere; }
+.jarvis-panel { width: min(440px, calc(100vw - 32px)); }
+.jarvis-settings { max-height: min(52vh, 560px); padding-right: 4px; }
+.jarvis-model-status { margin: 0; font-size: 12px; line-height: 1.5; color: var(--muted); overflow-wrap: anywhere; }
+.jarvis-model-manual summary { cursor: pointer; color: var(--primary); font-size: 12px; padding: 6px 0; }
+.jarvis-model-manual label { margin-top: 6px; }
+.jarvis-compose { display: grid; grid-template-columns: minmax(0, 1fr); gap: 10px; }
+.jarvis-compose textarea { width: 100%; min-width: 0; min-height: 80px; max-height: 180px; }
+.jarvis-compose-actions { display: flex; align-items: stretch; gap: 8px; }
+.jarvis-compose-actions .button { min-height: 44px; cursor: pointer; justify-content: center; }
+.jarvis-mic { flex: 1; min-width: 0; white-space: normal; border-color: var(--primary); color: var(--primary); background: var(--primary-light); }
+.jarvis-mic:hover:not(:disabled) { box-shadow: 0 0 0 3px var(--primary-light); }
+.jarvis-mic[aria-pressed="true"] { background: #fff0f1; color: #a6213c; border-color: #c73e59; }
+.jarvis-compose-actions .button:disabled { cursor: wait; }
+.jarvis-mic-help { margin: -4px 0 0; color: var(--muted); font-size: 12px; line-height: 1.5; }

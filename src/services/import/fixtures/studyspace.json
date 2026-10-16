@@ -1,0 +1,20 @@
+{
+  "format": "studyspace-import",
+  "version": 1,
+  "notes": [
+    {
+      "title": "Aula JSON",
+      "text": "Fonte textual preservada."
+    }
+  ],
+  "flashcards": [
+    {
+      "front": "Pergunta JSON",
+      "back": "Resposta JSON",
+      "tags": [
+        "biologia"
+      ],
+      "noteIndex": 0
+    }
+  ]
+}

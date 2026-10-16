@@ -1,0 +1,52 @@
+{
+  "mission": "2.4",
+  "createdAt": "2026-10-14T15:53:53.645Z",
+  "scope": "Controles indispensáveis JARVIS/importação, arquivos originais preservados em checkpoint, armazenamento v2. Não substitui a comparação visual.",
+  "files": {
+    "src/App.tsx": {
+      "beforeSha256": "cc57bf89953668a887a1a2ac1c2222ddadcdce9f7becfb759760e401f2c75510",
+      "afterSha256": "9f2d647bf856ec158e8e7b8dac091445931b776a06a90e0ec3adbd20092f5cd4",
+      "bytes": 20068
+    },
+    "src/shared/types.ts": {
+      "beforeSha256": "d627d66b0f919d3be67d9c073e0088628e54e941ee3d718d2f862ffcb9b0f849",
+      "afterSha256": "3d9c9e288ce76d5cbf5356a1c688cbf78a51e5b82f193116a83dfcbf5abe6fd8",
+      "bytes": 3583
+    },
+    "src/services/storage/sqlite.ts": {
+      "beforeSha256": "2409a6a628319fab6b327293a2f38b6ac4153a66ca49c07c5f67b948330a4eb6",
+      "afterSha256": "2ad819202f3f78c8c6838e395af81bf5b70f48734ac4322915ca0fa52ee8069f",
+      "bytes": 13933
+    },
+    "src/services/storage/sqlite.test.ts": {
+      "beforeSha256": "ba9a971d8967148347d32f9a87a7bf8cefe9609bd45cfd5fa6cbe41e535ae1eb",
+      "afterSha256": "2dee4e4c0a428f8aa01edebe559dca134417a1d5e3c821ccc03647d6a2adafc4",
+      "bytes": 14338
+    },
+    "src/services/storage/native.ts": {
+      "beforeSha256": "fc42ab872daabf0541ba71adc19f87333add3e0ac8543d32e0efa24099f9c92c",
+      "afterSha256": "3c7f78a6a56d1f1406017b676f2cabc31e59db26489878fb95eb75d48ec480e7",
+      "bytes": 3754
+    },
+    "src/services/storage/validation.ts": {
+      "beforeSha256": "e782fb787239df664f9775a624b11bdaef31adb7da618f91fd5efc2033ba0e37",
+      "afterSha256": "7b148533df32b9aa8cbcca14c558760c58583009f512d2fb9c3f72d258927638",
+      "bytes": 15862
+    },
+    "src/features/subjects/SubjectWorkspace.tsx": {
+      "beforeSha256": "22769b591cda2fbf5e45ff6b94baf9d12005c328716cf2ada83e018e641189d7",
+      "afterSha256": "e2e773052e84bfd522b89f8600310c5801fb5be05bc84a24daf24fb06732ab38",
+      "bytes": 4436
+    },
+    "src/features/flashcards/CardLibrary.tsx": {
+      "beforeSha256": "5f7657a368ec6de1e943a2c3ef855123a3259ebe8b14e78bbf71c635816d7ce0",
+      "afterSha256": "f02f128c7fe4008b65ae54b8984263d6344ce2365f3fbecf07ca8a0470709d2f",
+      "bytes": 5728
+    },
+    "src/features/flashcards/Review.tsx": {
+      "beforeSha256": "e7a0ea9583561e16779bb423353e145d0cd10c77a04a70116ccdb7527297313e",
+      "afterSha256": "b6ce36acb97270f86169d0017e3bd53945be90a9c68565ea4cae405fe2759f71",
+      "bytes": 9191
+    }
+  }
+}

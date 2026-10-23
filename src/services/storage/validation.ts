@@ -1,7 +1,13 @@
 import { z } from 'zod';
 import type { BackupDocument, RichDocument, Snapshot } from '../../shared/types';
+import { MAX_BACKUP_BYTES, serializeBackup } from '../backup-json';
+import { studyTrackSchema, validateStudyLinks } from '../../domain/study/validation';
+import { plannerSchema, validatePlannerLinks } from '../../domain/planner/validation';
+import { validateSchedule, validateScheduleLinks } from '../../domain/spaced-repetition/engine';
+import type { ReviewSchedule } from '../../domain/spaced-repetition/types';
+import { errorEntrySchema, validateErrorLinks } from '../../domain/error-notebook/engine';
 
-export const MAX_BACKUP_BYTES = 50 * 1024 * 1024;
+export { MAX_BACKUP_BYTES } from '../backup-json';
 const MAX_DOCUMENT_BYTES = 2 * 1024 * 1024;
 
 const nonempty = (max: number, label: string) => z.string()
@@ -14,7 +20,7 @@ export const idSchema = nonempty(160, 'O identificador');
 export const themeSchema = z.enum(['light', 'dark']);
 const accentSchema = z.enum(['lavender', 'blue', 'green', 'peach', 'rose']);
 const ratingSchema = z.union([z.literal(1), z.literal(2), z.literal(3), z.literal(4)]);
-const utcSchema = z.string().refine((value) => {
+export const utcSchema = z.string().refine((value) => {
   if (!/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/.test(value)) return false;
   const date = new Date(value);
   return Number.isFinite(date.getTime()) && date.toISOString() === value;
@@ -86,7 +92,15 @@ export const flashcardInputSchema = z.object({
 export const updateFlashcardSchema = z.object({
   id: idSchema, front: nonempty(20_000, 'A frente do cartão'), back: nonempty(20_000, 'O verso do cartão'),
 }).strict();
-export const reviewInputSchema = z.object({ flashcardId: idSchema, sessionId: idSchema, rating: ratingSchema }).strict();
+const reviewFields = { flashcardId: idSchema, sessionId: idSchema, rating: ratingSchema };
+export const reviewInputSchema = z.object({
+  ...reviewFields, schedule: z.boolean().optional(),
+  admission: z.object({ newCardLimit: z.number().int().min(0).max(50), dayStart: utcSchema, dayEnd: utcSchema }).strict().optional(),
+}).strict().superRefine((value, context) => {
+  if (!value.admission) return;
+  const span = Date.parse(value.admission.dayEnd) - Date.parse(value.admission.dayStart);
+  if (!value.schedule || span <= 0 || span > 48 * 60 * 60 * 1000) context.addIssue({ code: 'custom', message: 'A cota diária precisa de uma revisão espaçada e de um intervalo de dia válido.' });
+});
 
 const chronological = (value: { createdAt: string; updatedAt: string }) => value.createdAt <= value.updatedAt;
 export const subjectSchema = subjectInputSchema.extend({ id: idSchema, createdAt: utcSchema, updatedAt: utcSchema }).strict()
@@ -98,13 +112,21 @@ export const noteSchema = z.object({
 }).strict().refine(chronological, 'A data da alteração não pode preceder a criação.');
 export const flashcardSchema = flashcardInputSchema.extend({ id: idSchema, createdAt: utcSchema, updatedAt: utcSchema }).strict()
   .refine(chronological, 'A data da alteração não pode preceder a criação.');
-export const reviewLogSchema = reviewInputSchema.extend({ id: idSchema, reviewedAt: utcSchema }).strict();
+export const reviewLogSchema = z.object({ ...reviewFields, id: idSchema, reviewedAt: utcSchema }).strict();
+
+export const reviewScheduleSchema = z.unknown().transform((value, context): ReviewSchedule => {
+  try { return validateSchedule(value); }
+  catch (error) {
+    context.addIssue({ code: 'custom', message: error instanceof Error ? error.message : 'A agenda de revisão é inválida.' });
+    return z.NEVER;
+  }
+});
 
 export const hashSchema = z.string().regex(/^[a-f0-9]{64}$/);
 const base64Schema = z.string().min(4).max(44_739_244).regex(/^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/);
 export const importImageSchema = z.object({ assetHash: hashSchema, side: z.enum(['front','back']), alt: z.string().max(500).optional() }).strict();
 export const importAssetSchema = z.object({ sha256: hashSchema, fileName: nonempty(255, 'O nome do arquivo'), mimeType: z.enum(['image/png','image/jpeg','image/webp','image/gif','image/bmp']), dataBase64: base64Schema }).strict();
-const pagesSchema = z.array(z.object({ page: z.number().int().min(1).max(10000), text: plainTextSchema }).strict()).max(10000).superRefine((pages,ctx)=>{
+export const pagesSchema = z.array(z.object({ page: z.number().int().min(1).max(10000), text: plainTextSchema }).strict()).max(10000).superRefine((pages,ctx)=>{
   if(new Set(pages.map(p=>p.page)).size!==pages.length) ctx.addIssue({code:'custom',message:'As páginas do documento são inconsistentes.'});
   if(new TextEncoder().encode(pages.map(p=>p.text).join('')).length>8*1024*1024) ctx.addIssue({code:'custom',message:'O texto do documento excede o limite permitido.'});
 });
@@ -132,7 +154,25 @@ export const snapshotSchema = z.object({
   settings: z.object({ theme: themeSchema }).strict(),
   documents: z.array(documentMetadataSchema).max(50000).optional(),
   cardMetadata: z.array(cardMetadataSchema).max(200000).optional(),
+  studyTracks: z.array(studyTrackSchema).max(100).optional(),
+  studyPlanners: z.array(plannerSchema).max(100).optional(),
+  reviewSchedules: z.array(reviewScheduleSchema).max(200_000).optional(),
+  errorEntries: z.array(errorEntrySchema).max(5000).optional(),
 }).strict().superRefine((data, context) => {
+  const plannerIds = new Set<string>();
+  for (const planner of data.studyPlanners ?? []) {
+    if (plannerIds.has(planner.trackId)) context.addIssue({ code:'custom',message:'Há agendas duplicadas para a mesma trilha.' });
+    plannerIds.add(planner.trackId);
+    try { validatePlannerLinks(planner, data); }
+    catch (error) { context.addIssue({ code:'custom',message:error instanceof Error ? error.message : 'Os vínculos da agenda são inválidos.' }); }
+  }
+  const trackIds = new Set<string>();
+  for (const track of data.studyTracks ?? []) {
+    if (trackIds.has(track.id)) context.addIssue({ code: 'custom', message: 'Há identificadores duplicados em trilhas.' });
+    trackIds.add(track.id);
+    try { validateStudyLinks(track, data); }
+    catch (error) { context.addIssue({ code: 'custom', message: error instanceof Error ? error.message : 'Os vínculos da trilha são inválidos.' }); }
+  }
   function unique(values: { id: string }[], name: string) {
     const ids = new Set<string>();
     for (const value of values) {
@@ -169,12 +209,20 @@ export const snapshotSchema = z.object({
     if (reviews.has(key)) context.addIssue({ code: 'custom', message: 'Uma sessão contém duas respostas para o mesmo cartão.' });
     reviews.add(key);
   }
+  try { validateScheduleLinks(data.reviewSchedules ?? [], data.reviewLogs, cards); }
+  catch (error) { context.addIssue({ code:'custom',message: error instanceof Error ? error.message : 'Os vínculos da agenda de revisão são inválidos.' }); }
+  try { validateErrorLinks(data.errorEntries ?? [], data); }
+  catch (error) { context.addIssue({code:'custom',message:error instanceof Error ? error.message : 'Os vínculos do caderno são inválidos.'}); }
 });
 
 const backupSchema = z.object({
   format: z.literal('studyspace-backup'), version: z.union([z.literal(1),z.literal(2)]), exportedAt: utcSchema, data: snapshotSchema,
   materials: z.object({ documents: z.array(z.object({ documentId: idSchema, dataBase64: base64Schema, pages: pagesSchema }).strict()).max(50000), assets: z.array(importAssetSchema).max(100000) }).strict().optional(),
 }).strict().superRefine((backup,ctx) => {
+  if (backup.data.errorEntries?.length) ctx.addIssue({code:'custom',message:'O caderno de erros exige o arquivo .studyspace v7. Exporte a cópia portátil para preservar estes dados.'});
+  if (backup.data.reviewSchedules?.length) ctx.addIssue({code:'custom',message:'A revisão espaçada exige o arquivo .studyspace v6. Exporte a cópia portátil para preservar estes dados.'});
+  if (backup.data.studyPlanners?.length) ctx.addIssue({code:'custom',message:'Agendas exigem o arquivo .studyspace v5. Exporte a cópia portátil para preservar estes dados.'});
+  if (backup.data.studyTracks?.length) ctx.addIssue({code:'custom',message:'Trilhas e diagnósticos exigem o arquivo .studyspace v4 ou mais recente. Exporte a cópia portátil para preservar estes dados.'});
   const docs = new Set((backup.materials?.documents ?? []).map(d=>d.documentId));
   if (docs.size !== (backup.materials?.documents.length ?? 0) || docs.size !== (backup.data.documents?.length ?? 0) || (backup.data.documents ?? []).some(d=>!docs.has(d.id))) ctx.addIssue({code:'custom',message:'O backup não contém os arquivos de todos os documentos.'});
   const assets = new Set((backup.materials?.assets ?? []).map(a=>a.sha256));
@@ -191,11 +239,7 @@ export function validate<T>(schema: z.ZodType<T>, value: unknown, fallback = 'Os
 }
 
 export function validateBackup(value: unknown): BackupDocument {
-  let encoded: string | undefined;
-  try { encoded = JSON.stringify(value); } catch { throw new Error('O backup não contém JSON válido.'); }
-  if (!encoded || new TextEncoder().encode(encoded).byteLength > MAX_BACKUP_BYTES) {
-    throw new Error('O backup está vazio ou excede o limite de 50 MB.');
-  }
+  serializeBackup(value);
   return validate(backupSchema, value, 'O backup é inválido ou usa uma versão não suportada.');
 }
 
@@ -205,6 +249,7 @@ export function validateSnapshot(value: unknown): Snapshot {
 
 export function storageError(error: unknown): Error {
   const message = error instanceof Error ? error.message : String(error);
+  if (message.startsWith('Não foi possível verificar uma cópia antes') || message.startsWith('A atualização do banco foi interrompida.')) return new Error(message);
   if (message.includes('FOREIGN KEY')) return new Error('A matéria, nota ou cartão vinculado não existe ou pertence a outra matéria.');
   if (message.includes('UNIQUE constraint')) return new Error('Este registro já existe.');
   if (message.includes('CHECK constraint') || message.includes('NOT NULL')) return new Error('Os dados não atendem às regras de armazenamento.');

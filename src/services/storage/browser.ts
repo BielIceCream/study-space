@@ -2,7 +2,9 @@ import initSqlJs from 'sql.js';
 import wasmUrl from 'sql.js/dist/sql-wasm.wasm?url';
 import type { StorageService } from '../../shared/types';
 import { IndexedDbPersistence } from './indexeddb';
-import { createSQLiteStorage } from './sqlite';
+import { createSQLiteStorage, exportRecoveryArchive } from './sqlite';
+import { listRecoveryMetadata } from './recovery';
+import type { RecoveryMetadata } from './recovery';
 import { storageError } from './validation';
 
 export async function createBrowserStorage(): Promise<StorageService> {
@@ -14,4 +16,16 @@ export async function createBrowserStorage(): Promise<StorageService> {
     await persistence.close().catch(() => undefined);
     throw storageError(error);
   }
+}
+
+export async function listBrowserRecoveryCopies(): Promise<RecoveryMetadata[]> {
+  const persistence = new IndexedDbPersistence();
+  try { return await persistence.exclusive(() => listRecoveryMetadata(persistence)); }
+  finally { await persistence.close(); }
+}
+
+export async function exportBrowserRecoveryCopy(id: string): Promise<Blob> {
+  const persistence = new IndexedDbPersistence();
+  try { return await exportRecoveryArchive(persistence, () => initSqlJs({ locateFile: () => wasmUrl }), id); }
+  finally { await persistence.close(); }
 }

@@ -47,20 +47,20 @@ pub struct ImportBatch {pub subject_id:String,pub source_name:String,pub format:
 #[serde(rename_all="camelCase")]
 pub struct ImportResult {pub note_ids:Vec<String>,pub flashcard_ids:Vec<String>,pub document_ids:Vec<String>,pub skipped_duplicates:usize}
 fn invalid(message:&str)->StoreError {StoreError::Invalid(message.into())}
-fn check_hash(hash:&str)->StoreResult<()> {if hash.len()!=64 || !hash.bytes().all(|c|c.is_ascii_digit()||(b'a'..=b'f').contains(&c)){return Err(invalid("O hash do arquivo é inválido."));}Ok(())}
+pub(crate) fn check_hash(hash:&str)->StoreResult<()> {if hash.len()!=64 || !hash.bytes().all(|c|c.is_ascii_digit()||(b'a'..=b'f').contains(&c)){return Err(invalid("O hash do arquivo é inválido."));}Ok(())}
 fn decode(data:&str,hash:&str,max:usize)->StoreResult<Vec<u8>> {
     check_hash(hash)?;if data.len()>max.div_ceil(3)*4{return Err(invalid("O arquivo excede o limite permitido."));}
     let bytes=STANDARD.decode(data).map_err(|_|invalid("O arquivo contém dados inválidos."))?;
     if bytes.is_empty()||bytes.len()>max{return Err(invalid("O arquivo está vazio ou excede o limite permitido."));}
     if format!("{:x}",Sha256::digest(&bytes))!=hash{return Err(invalid("A integridade do arquivo não confere."));}Ok(bytes)
 }
-fn check_pages(pages:&[Page])->StoreResult<()> {
+pub(crate) fn check_pages(pages:&[Page])->StoreResult<()> {
     if pages.len()>10000{return Err(invalid("O documento excede o limite de páginas."));}
     let mut seen=HashSet::new();let mut total=0;
     for page in pages{if !(1..=10000).contains(&page.page)||!seen.insert(page.page){return Err(invalid("As páginas do documento são inconsistentes."));}validation::text(&page.text,2_000_000,"O texto da página",true)?;total+=page.text.len();}
     if total>8*1024*1024{return Err(invalid("O texto do documento excede o limite permitido."));}Ok(())
 }
-fn check_images(tags:&[String],images:&[CardImage])->StoreResult<()> {
+pub(crate) fn check_images(tags:&[String],images:&[CardImage])->StoreResult<()> {
     if tags.len()>100||images.len()>50{return Err(invalid("O cartão excede o limite de tags ou imagens."));}
     for tag in tags{validation::text(tag,120,"A tag",false)?;}
     for image in images{check_hash(&image.asset_hash)?;if !matches!(image.side.as_str(),"front"|"back"){return Err(invalid("A posição da imagem é inválida."));}if let Some(alt)=&image.alt{validation::text(alt,500,"A descrição da imagem",true)?;}}Ok(())
@@ -95,8 +95,8 @@ fn asset_bytes(asset:&Asset)->StoreResult<Vec<u8>>{
     let valid=match asset.mime_type.as_str(){"image/png"=>b.starts_with(b"\x89PNG\r\n\x1a\n"),"image/jpeg"=>b.starts_with(b"\xff\xd8\xff"),"image/gif"=>b.starts_with(b"GIF87a")||b.starts_with(b"GIF89a"),"image/bmp"=>b.len()>=54&&b.starts_with(b"BM"),"image/webp"=>b.starts_with(b"RIFF")&&b.get(8..12)==Some(b"WEBP"),_=>false};
     if !valid{return Err(invalid("O formato da imagem não confere com seu conteúdo."));}Ok(b)
 }
-fn insert_asset(connection:&Connection,asset:&Asset)->StoreResult<()>{let bytes=asset_bytes(asset)?;connection.execute("INSERT OR IGNORE INTO material_assets VALUES (?1,?2,?3,?4)",params![asset.sha256,asset.file_name,asset.mime_type,bytes])?;Ok(())}
-fn insert_document(connection:&Connection,meta:&DocumentMetadata,payload:&DocumentPayload)->StoreResult<()>{
+pub(crate) fn insert_asset(connection:&Connection,asset:&Asset)->StoreResult<()>{let bytes=asset_bytes(asset)?;connection.execute("INSERT OR IGNORE INTO material_assets VALUES (?1,?2,?3,?4)",params![asset.sha256,asset.file_name,asset.mime_type,bytes])?;Ok(())}
+pub(crate) fn insert_document(connection:&Connection,meta:&DocumentMetadata,payload:&DocumentPayload)->StoreResult<()>{
     validation::id(&meta.id)?;validation::id(&meta.subject_id)?;validation::id(&meta.note_id)?;validation::text(&meta.file_name,255,"O nome do arquivo",false)?;validation::text(&meta.mime_type,120,"O formato",false)?;validation::date(&meta.created_at)?;
     if !matches!(meta.kind.as_str(),"pdf"|"docx"|"txt"|"md"|"csv"|"json")||meta.page_count!=payload.pages.len(){return Err(invalid("Os metadados do documento são inválidos."));}check_pages(&payload.pages)?;
     let bytes=decode(&payload.data_base64,&meta.sha256,32*1024*1024)?;

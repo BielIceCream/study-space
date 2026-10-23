@@ -2,6 +2,7 @@ import { spawn } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { classifyLocalIdentity } from './identity.mjs';
 
 const address = 'http://127.0.0.1:1420/';
 const runtime = dirname(fileURLToPath(import.meta.url));
@@ -9,17 +10,18 @@ const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
 async function status() {
   try {
     const response = await fetch(address + '__studyspace_local__/health', { headers: { connection: 'close' }, signal: AbortSignal.timeout(600), redirect: 'error' });
-    return response.ok && await response.text() === 'StudySpace-Local-0.2.0' ? 'ready' : 'occupied';
+    return response.ok ? classifyLocalIdentity(await response.text()) : 'occupied';
   } catch (error) { return error.cause?.code === 'ECONNREFUSED' ? 'closed' : 'occupied'; }
 }
 
 try {
   if (process.argv.includes('--stop')) {
     const current = await status();
-    if (current === 'ready') {
+    if (current === 'occupied') throw new Error('A porta 1420 está ocupada por outro programa. Nenhum processo foi encerrado.');
+    if (current === 'ready' || current === 'legacy') {
       const path = join(process.env.LOCALAPPDATA || process.env.TEMP, 'StudySpace-Local', 'servidor.json');
       const { token } = JSON.parse(readFileSync(path, 'utf8'));
-      const response = await fetch(address + '__studyspace_local__/stop', { method: 'POST', headers: { 'x-studyspace-token': token, connection: 'close' }, signal: AbortSignal.timeout(2000) });
+      const response = await fetch(address + '__studyspace_local__/stop', { method: 'POST', headers: { 'x-studyspace-token': token, connection: 'close' }, signal: AbortSignal.timeout(2000), redirect: 'error' });
       if (!response.ok) throw new Error('Não foi possível encerrar o StudySpace.');
       await response.text();
       let closed = false;
@@ -32,6 +34,7 @@ try {
     console.log('StudySpace encerrado. Seus dados continuam salvos no navegador.');
   } else {
     let current = await status();
+    if (current === 'legacy') throw new Error('Uma versão anterior do StudySpace ainda está aberta. Salve sua edição, use "Encerrar StudySpace.cmd" e abra novamente para iniciar a versão 2.0.0. Seus dados continuam no mesmo navegador e endereço.');
     if (current === 'occupied') throw new Error('A porta 1420 está ocupada por outro programa. Feche esse programa e tente novamente.');
     if (current === 'closed') {
       const server = spawn(process.execPath, [join(runtime, 'server.mjs')], { detached: true, windowsHide: true, stdio: 'ignore', cwd: runtime });

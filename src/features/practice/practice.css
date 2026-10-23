@@ -1,0 +1,38 @@
+.practice-page { max-width: 1320px; margin: 0 auto; padding: 39px 44px 35px; }
+.practice-page .page-heading { flex-wrap: wrap; gap: 18px; }
+.practice-notice { display: flex; align-items: flex-start; gap: 13px; margin: 25px 0; padding: 18px 21px; border: 1px solid var(--border); border-radius: 12px; background: var(--surface); color: var(--muted); font-size: 13px; line-height: 1.8; }
+.practice-notice svg { color: var(--primary-text); flex-shrink: 0; margin-top: 3px; }
+.practice-layout { display: grid; grid-template-columns: minmax(280px, .8fr) minmax(0, 1.2fr); gap: 24px; align-items: start; }
+.practice-settings, .practice-preview, .practice-empty { min-width: 0; padding: 24px; border: 1px solid var(--border); border-radius: 14px; background: var(--surface); }
+.practice-settings h2, .practice-preview h2, .practice-empty h2 { font-size: 20px; line-height: 1.5; margin-bottom: 20px; }
+.practice-preview h2:focus { outline: 2px solid var(--primary); outline-offset: 5px; border-radius: 2px; }
+.practice-modes { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 24px; }
+.practice-modes .button { flex: 1; }
+.practice-fields { border: 0; padding: 0; margin: 0; min-width: 0; display: grid; gap: 10px; }
+.practice-fields label { font-size: 12px; color: var(--text); line-height: 1.7; }
+.practice-page .input { width: 100%; min-width: 0; }
+.practice-fields > label:not(:first-of-type), .practice-fields > .button { margin-top: 10px; }
+.practice-fields > .button { justify-self: start; }
+.practice-fields textarea { resize: vertical; line-height: 1.8; }
+.practice-date-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 14px; margin: 8px 0; }
+.practice-date-grid > div { display: grid; gap: 10px; min-width: 0; }
+.practice-help { color: var(--muted); font-size: 11px; line-height: 1.85; margin: 6px 0 12px; }
+.practice-context { display: flex; align-items: flex-start; gap: 8px; padding: 13px; border-radius: 8px; background: var(--primary-light); color: var(--primary-text); font-size: 12px; line-height: 1.8; margin: 6px 0; }
+.practice-context svg { flex-shrink: 0; margin-top: 3px; }
+.practice-warnings { padding-left: 19px; margin: 0 0 16px; color: var(--muted); font-size: 12px; line-height: 1.85; }
+.practice-warnings li + li { margin-top: 8px; }
+.practice-preview-text { white-space: pre-wrap; overflow-wrap: anywhere; font-size: 12px; line-height: 1.9; color: var(--text); }
+.practice-preview > .practice-preview-text { max-height: 650px; overflow-y: auto; padding: 17px; border: 1px solid var(--border); border-radius: 9px; background: var(--muted-surface); margin: 16px 0; }
+.practice-preview > .practice-preview-text:focus-visible { outline: 2px solid var(--primary); outline-offset: 3px; }
+.practice-discard { margin-top: 18px; }
+.practice-answer-key { border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); padding: 15px 0; margin: 18px 0; }
+.practice-answer-key summary { font-size: 12px; font-weight: 600; color: var(--primary-text); cursor: pointer; line-height: 1.8; }
+.practice-answer-key summary:focus-visible { outline: 2px solid var(--primary); outline-offset: 5px; }
+.practice-answer-key .practice-preview-text { margin-top: 18px; }
+.practice-preview-empty, .practice-empty { text-align: center; color: var(--muted); font-size: 13px; line-height: 1.9; }
+.practice-preview-empty { padding: 45px 16px; }
+.practice-preview-empty svg, .practice-empty > svg { color: var(--primary-text); margin: 0 auto 16px; }
+.practice-actions { display: flex; gap: 12px; margin-top: 20px; }
+.practice-saved { margin-top: 14px; color: var(--green); font-size: 12px; line-height: 1.8; }
+@media (max-width: 1100px) { .practice-page { padding: 30px; } .practice-layout { gap: 18px; grid-template-columns: minmax(260px, .85fr) minmax(0, 1.15fr); } .practice-settings, .practice-preview { padding: 20px; } .practice-date-grid { grid-template-columns: minmax(0, 1fr); } }
+@media (max-width: 760px) { .practice-page { padding: 25px 20px; } .practice-page .page-heading h1 { font-size: 27px; } .practice-notice { padding: 16px; } .practice-layout { grid-template-columns: minmax(0, 1fr); gap: 20px; } .practice-settings, .practice-preview { padding: 18px; } .practice-page .button { min-height: 44px; } .practice-actions .button { flex-grow: 1; } .practice-preview > .practice-preview-text { max-height: 480px; padding: 13px; } }

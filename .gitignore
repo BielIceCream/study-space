@@ -24,3 +24,6 @@ _checkpoints/
 _previous-release/
 _diagnostics/
 *.zip
+
+# Skills e configurações pessoais: apenas nesta máquina
+/.agents/

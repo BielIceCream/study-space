@@ -108,7 +108,7 @@ fn actual_version_one_migration_keeps_existing_notes_revision_dates_and_theme() 
     let snapshot=storage::get_snapshot(&mut connection).unwrap(); assert_eq!(snapshot.notes[0].id,"legacy-note"); assert_eq!(snapshot.notes[0].revision,7);
     assert_eq!(snapshot.notes[0].plain_text,"Fonte preservada."); assert_eq!(snapshot.notes[0].created_at,"2026-10-13T12:00:00.000Z");
     assert_eq!(snapshot.settings.theme,crate::models::Theme::Dark); assert!(snapshot.documents.is_empty());
-    assert_eq!(connection.pragma_query_value(None,"user_version",|r|r.get::<_,i32>(0)).unwrap(),2);
+    assert_eq!(connection.pragma_query_value(None,"user_version",|r|r.get::<_,i32>(0)).unwrap(),6);
     import_batch(&mut connection,batch("legacy")).unwrap(); assert!(storage::get_snapshot(&mut connection).unwrap().notes.iter().any(|n|n.id=="legacy-note"&&n.revision==7));
 }
 

@@ -1,0 +1,253 @@
+[
+  {
+    "name": "novo: Errei retoma em dez minutos",
+    "previous": null,
+    "review": {
+      "id": "r-again",
+      "flashcardId": "card",
+      "sessionId": "s-again",
+      "rating": 1,
+      "reviewedAt": "2026-10-21T12:00:00.000Z"
+    },
+    "expected": {
+      "flashcardId": "card",
+      "algorithmVersion": 1,
+      "stage": 0,
+      "repetitions": 1,
+      "lapses": 1,
+      "lastReviewId": "r-again",
+      "lastReviewedAt": "2026-10-21T12:00:00.000Z",
+      "dueAt": "2026-10-21T12:10:00.000Z",
+      "firstReviewId": "r-again",
+      "introducedAt": "2026-10-21T12:00:00.000Z"
+    }
+  },
+  {
+    "name": "novo: Difícil retoma em uma hora",
+    "previous": null,
+    "review": {
+      "id": "r-hard",
+      "flashcardId": "card",
+      "sessionId": "s-hard",
+      "rating": 2,
+      "reviewedAt": "2026-10-21T12:00:00.000Z"
+    },
+    "expected": {
+      "flashcardId": "card",
+      "algorithmVersion": 1,
+      "stage": 0,
+      "repetitions": 1,
+      "lapses": 0,
+      "lastReviewId": "r-hard",
+      "lastReviewedAt": "2026-10-21T12:00:00.000Z",
+      "dueAt": "2026-10-21T13:00:00.000Z",
+      "firstReviewId": "r-hard",
+      "introducedAt": "2026-10-21T12:00:00.000Z"
+    }
+  },
+  {
+    "name": "novo: Bom inicia intervalo de um dia",
+    "previous": null,
+    "review": {
+      "id": "r-good",
+      "flashcardId": "card",
+      "sessionId": "s-good",
+      "rating": 3,
+      "reviewedAt": "2026-10-21T12:00:00.000Z"
+    },
+    "expected": {
+      "flashcardId": "card",
+      "algorithmVersion": 1,
+      "stage": 1,
+      "repetitions": 1,
+      "lapses": 0,
+      "lastReviewId": "r-good",
+      "lastReviewedAt": "2026-10-21T12:00:00.000Z",
+      "dueAt": "2026-10-22T12:00:00.000Z",
+      "firstReviewId": "r-good",
+      "introducedAt": "2026-10-21T12:00:00.000Z"
+    }
+  },
+  {
+    "name": "novo: Fácil inicia intervalo de três dias",
+    "previous": null,
+    "review": {
+      "id": "r-easy",
+      "flashcardId": "card",
+      "sessionId": "s-easy",
+      "rating": 4,
+      "reviewedAt": "2026-10-21T12:00:00.000Z"
+    },
+    "expected": {
+      "flashcardId": "card",
+      "algorithmVersion": 1,
+      "stage": 2,
+      "repetitions": 1,
+      "lapses": 0,
+      "lastReviewId": "r-easy",
+      "lastReviewedAt": "2026-10-21T12:00:00.000Z",
+      "dueAt": "2026-10-24T12:00:00.000Z",
+      "firstReviewId": "r-easy",
+      "introducedAt": "2026-10-21T12:00:00.000Z"
+    }
+  },
+  {
+    "name": "retomada: lapso reinicia estágio sem apagar repetições",
+    "previous": {
+      "flashcardId": "card",
+      "algorithmVersion": 1,
+      "stage": 4,
+      "repetitions": 4,
+      "lapses": 0,
+      "lastReviewId": "r-before",
+      "lastReviewedAt": "2026-10-01T12:00:00.000Z",
+      "dueAt": "2026-10-15T12:00:00.000Z",
+      "firstReviewId": "r-first",
+      "introducedAt": "2026-01-01T12:00:00.000Z"
+    },
+    "review": {
+      "id": "r-lapse",
+      "flashcardId": "card",
+      "sessionId": "s-lapse",
+      "rating": 1,
+      "reviewedAt": "2026-10-21T12:00:00.000Z"
+    },
+    "expected": {
+      "flashcardId": "card",
+      "algorithmVersion": 1,
+      "stage": 0,
+      "repetitions": 5,
+      "lapses": 1,
+      "lastReviewId": "r-lapse",
+      "lastReviewedAt": "2026-10-21T12:00:00.000Z",
+      "dueAt": "2026-10-21T12:10:00.000Z",
+      "firstReviewId": "r-first",
+      "introducedAt": "2026-01-01T12:00:00.000Z"
+    }
+  },
+  {
+    "name": "maduro: Difícil conserva estágio e reduz intervalo",
+    "previous": {
+      "flashcardId": "card",
+      "algorithmVersion": 1,
+      "stage": 5,
+      "repetitions": 5,
+      "lapses": 0,
+      "lastReviewId": "r-before",
+      "lastReviewedAt": "2026-09-01T12:00:00.000Z",
+      "dueAt": "2026-10-01T12:00:00.000Z",
+      "firstReviewId": "r-first",
+      "introducedAt": "2026-01-01T12:00:00.000Z"
+    },
+    "review": {
+      "id": "r-mature-hard",
+      "flashcardId": "card",
+      "sessionId": "s-mature-hard",
+      "rating": 2,
+      "reviewedAt": "2026-10-21T12:00:00.000Z"
+    },
+    "expected": {
+      "flashcardId": "card",
+      "algorithmVersion": 1,
+      "stage": 5,
+      "repetitions": 6,
+      "lapses": 0,
+      "lastReviewId": "r-mature-hard",
+      "lastReviewedAt": "2026-10-21T12:00:00.000Z",
+      "dueAt": "2026-11-05T12:00:00.000Z",
+      "firstReviewId": "r-first",
+      "introducedAt": "2026-01-01T12:00:00.000Z"
+    }
+  },
+  {
+    "name": "teto: Fácil permanece em sessenta dias",
+    "previous": {
+      "flashcardId": "card",
+      "algorithmVersion": 1,
+      "stage": 6,
+      "repetitions": 6,
+      "lapses": 0,
+      "lastReviewId": "r-before",
+      "lastReviewedAt": "2026-08-01T12:00:00.000Z",
+      "dueAt": "2026-09-30T12:00:00.000Z",
+      "firstReviewId": "r-first",
+      "introducedAt": "2026-01-01T12:00:00.000Z"
+    },
+    "review": {
+      "id": "r-cap",
+      "flashcardId": "card",
+      "sessionId": "s-cap",
+      "rating": 4,
+      "reviewedAt": "2026-10-21T12:00:00.000Z"
+    },
+    "expected": {
+      "flashcardId": "card",
+      "algorithmVersion": 1,
+      "stage": 6,
+      "repetitions": 7,
+      "lapses": 0,
+      "lastReviewId": "r-cap",
+      "lastReviewedAt": "2026-10-21T12:00:00.000Z",
+      "dueAt": "2026-12-20T12:00:00.000Z",
+      "firstReviewId": "r-first",
+      "introducedAt": "2026-01-01T12:00:00.000Z"
+    }
+  },
+  {
+    "name": "UTC: milissegundos e ano bissexto preservados",
+    "previous": null,
+    "review": {
+      "id": "r-leap",
+      "flashcardId": "card",
+      "sessionId": "s-leap",
+      "rating": 3,
+      "reviewedAt": "2028-02-28T23:59:59.999Z"
+    },
+    "expected": {
+      "flashcardId": "card",
+      "algorithmVersion": 1,
+      "stage": 1,
+      "repetitions": 1,
+      "lapses": 0,
+      "lastReviewId": "r-leap",
+      "lastReviewedAt": "2028-02-28T23:59:59.999Z",
+      "dueAt": "2028-02-29T23:59:59.999Z",
+      "firstReviewId": "r-leap",
+      "introducedAt": "2028-02-28T23:59:59.999Z"
+    }
+  },
+  {
+    "name": "limite: avaliação no instante exato do vencimento",
+    "previous": {
+      "flashcardId": "card",
+      "algorithmVersion": 1,
+      "stage": 1,
+      "repetitions": 1,
+      "lapses": 0,
+      "lastReviewId": "r-before",
+      "lastReviewedAt": "2026-10-21T12:00:00.000Z",
+      "dueAt": "2026-10-22T12:00:00.000Z",
+      "firstReviewId": "r-before",
+      "introducedAt": "2026-10-21T12:00:00.000Z"
+    },
+    "review": {
+      "id": "r-exact",
+      "flashcardId": "card",
+      "sessionId": "s-exact",
+      "rating": 3,
+      "reviewedAt": "2026-10-22T12:00:00.000Z"
+    },
+    "expected": {
+      "flashcardId": "card",
+      "algorithmVersion": 1,
+      "stage": 2,
+      "repetitions": 2,
+      "lapses": 0,
+      "lastReviewId": "r-exact",
+      "lastReviewedAt": "2026-10-22T12:00:00.000Z",
+      "dueAt": "2026-10-25T12:00:00.000Z",
+      "firstReviewId": "r-before",
+      "introducedAt": "2026-10-21T12:00:00.000Z"
+    }
+  }
+]

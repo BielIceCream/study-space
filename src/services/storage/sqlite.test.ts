@@ -63,7 +63,7 @@ describe('armazenamento SQLite real', () => {
     const migrated = await open(persistence);
     expect(await migrated.getSnapshot()).toEqual(before);
     const inspected = new SQL.Database((await persistence.load())!);
-    expect(inspected.exec('PRAGMA user_version')[0].values[0][0]).toBe(2);
+    expect(inspected.exec('PRAGMA user_version')[0].values[0][0]).toBe(6);
     inspected.close();
   });
 
@@ -74,7 +74,7 @@ describe('armazenamento SQLite real', () => {
     await storage.close();
     const SQL = await sql;
     const future = new SQL.Database((await persistence.load())!);
-    future.run('PRAGMA user_version = 3');
+    future.run('PRAGMA user_version = 7');
     await persistence.save(future.export());
     future.close();
     const before = await persistence.load();

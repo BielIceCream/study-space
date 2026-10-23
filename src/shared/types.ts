@@ -1,4 +1,10 @@
 import type { ImportBatchInput, ImportResult, ImportedAsset, ImportedImage } from '../services/import/types';
+import type { BackupArchive } from '../services/backup-archive';
+import type { RecoveryMetadata } from '../services/storage/recovery';
+import type { StudyTrack, SaveStudyTrackInput } from '../domain/study/types';
+import type { StudyPlanner, SaveStudyPlannerInput } from '../domain/planner/types';
+import type { ReviewSchedule } from '../domain/spaced-repetition/types';
+import type { ErrorEntry, SaveErrorEntryInput } from '../domain/error-notebook/types';
 
 export type Accent = 'lavender' | 'blue' | 'green' | 'peach' | 'rose';
 export type Theme = 'light' | 'dark';
@@ -61,6 +67,10 @@ export interface Snapshot {
   settings: Settings;
   documents?: DocumentMetadata[];
   cardMetadata?: CardMetadata[];
+  studyTracks?: StudyTrack[];
+  studyPlanners?: StudyPlanner[];
+  reviewSchedules?: ReviewSchedule[];
+  errorEntries?: ErrorEntry[];
 }
 
 export interface DocumentMetadata {
@@ -98,10 +108,15 @@ export interface FlashcardInput {
   back: string;
 }
 export interface UpdateFlashcardInput { id: string; front: string; back: string }
-export interface ReviewInput { flashcardId: string; sessionId: string; rating: Rating }
+/** Only explicit spaced reviews update the schedule; existing free practice stays unchanged. */
+export interface ReviewAdmission { newCardLimit: number; dayStart: string; dayEnd: string }
+export interface ReviewInput { flashcardId: string; sessionId: string; rating: Rating; schedule?: boolean; admission?: ReviewAdmission }
 
 export interface StorageService {
   getSnapshot(): Promise<Snapshot>;
+  saveErrorEntry(input: SaveErrorEntryInput): Promise<ErrorEntry>;
+  saveStudyTrack(input: SaveStudyTrackInput): Promise<StudyTrack>;
+  saveStudyPlanner(input: SaveStudyPlannerInput): Promise<StudyPlanner>;
   createSubject(input: SubjectInput): Promise<Subject>;
   updateSubject(id: string, input: SubjectInput): Promise<Subject>;
   createNote(input: NoteInput): Promise<Note>;
@@ -115,6 +130,10 @@ export interface StorageService {
   getAsset(sha256: string): Promise<ImportedAsset>;
   exportBackup(): Promise<BackupDocument>;
   restoreBackup(backup: unknown): Promise<void>;
+  exportBackupArchive(): Promise<Blob>;
+  restoreBackupArchive(archive: BackupArchive): Promise<void>;
+  listRecoveryCopies(): Promise<RecoveryMetadata[]>;
+  exportRecoveryCopy(id: string): Promise<Blob>;
   close(): Promise<void>;
 }
 

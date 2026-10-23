@@ -114,7 +114,7 @@ describe('materiais em SQLite real', () => {
     const snapshot = await store.getSnapshot();
     expect(snapshot.notes[0]).toMatchObject({ id: 'legacy-note', bodyJson: body, revision: 7, createdAt: time, updatedAt: time, plainText: 'Fonte preservada.' });
     expect(snapshot.settings.theme).toBe('dark'); expect(snapshot.documents).toEqual([]);
-    const inspected = new SQL.Database((await persistence.load())!); expect(inspected.exec('PRAGMA user_version')[0].values[0][0]).toBe(2); inspected.close();
+    const inspected = new SQL.Database((await persistence.load())!); expect(inspected.exec('PRAGMA user_version')[0].values[0][0]).toBe(6); inspected.close();
     expect((await store.importBatch(await batch('legacy-subject'))).documentIds).toHaveLength(1);
     expect((await store.getSnapshot()).notes.find(n => n.id === 'legacy-note')?.revision).toBe(7);
   });

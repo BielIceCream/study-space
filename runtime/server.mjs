@@ -5,11 +5,11 @@ import { fileURLToPath } from 'node:url';
 import { randomBytes, timingSafeEqual } from 'node:crypto';
 import { publicConfiguration } from './config.mjs';
 import { jarvisCommand } from './jarvis.mjs';
+import { localIdentity } from './identity.mjs';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '../app');
 const settings = join(process.env.LOCALAPPDATA || process.env.TEMP, 'StudySpace-Local');
 const controlPath = join(settings, 'servidor.json');
-const identity = 'StudySpace-Local-0.2.0';
 const token = randomBytes(32).toString('hex');
 const mime = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.mjs': 'text/javascript; charset=utf-8', '.css': 'text/css; charset=utf-8', '.json': 'application/json', '.wasm': 'application/wasm', '.woff2': 'font/woff2', '.svg': 'image/svg+xml', '.png': 'image/png', '.ico': 'image/x-icon' };
 mkdirSync(settings, { recursive: true });
@@ -51,7 +51,7 @@ const server = http.createServer(async (req, res) => {
     } finally { clearTimeout(timeout); active--; }
     return;
   }
-  if (req.url === '/__studyspace_local__/health' && req.method === 'GET') return send(res, 200, identity);
+  if (req.url === '/__studyspace_local__/health' && req.method === 'GET') return send(res, 200, localIdentity);
   if (req.url === '/__studyspace_local__/stop' && req.method === 'POST') {
     const provided = Buffer.from(req.headers['x-studyspace-token'] || '');
     const expected = Buffer.from(token);
@@ -90,5 +90,5 @@ process.on('exit', () => {
 });
 if (!existsSync(join(root, 'index.html'))) throw new Error('Extraia todo o ZIP, incluindo a pasta app.');
 server.listen(1420, '127.0.0.1', () => {
-  writeFileSync(controlPath, JSON.stringify({ pid: process.pid, token }));
+  writeFileSync(controlPath, JSON.stringify({ pid: process.pid, token, identity: localIdentity }));
 });

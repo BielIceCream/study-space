@@ -1,0 +1,57 @@
+STUDYSPACE {{VERSION}} — EDIÇÃO LOCAL PARA WINDOWS X64
+
+COMO ABRIR
+1. Extraia todo o ZIP para uma pasta de sua escolha.
+2. Abra "Abrir StudySpace.cmd".
+3. Use seu navegador habitual em http://127.0.0.1:1420/.
+
+O pacote inclui o runtime do Node. Não é necessário instalar Node, Python
+ou Rust. Mantenha app, runtime e config junto dos arquivos .cmd.
+Use Windows 10/11 de 64 bits com navegador atualizado.
+
+ATUALIZAÇÃO DE UMA VERSÃO ANTERIOR
+Exporte um backup em "Dados e backup" antes de atualizar. Salve qualquer
+edição em andamento e use "Encerrar StudySpace.cmd" na pasta anterior.
+Extraia esta versão em outra pasta. Para manter o JARVIS configurado,
+copie somente seu config\.env para a nova pasta config.
+Abra a versão nova usando o mesmo navegador, perfil e endereço local.
+Se o iniciador identificar o servidor anterior, ele pedirá que você o
+encerre pelo atalho. Nenhum processo será encerrado automaticamente.
+Não execute duas versões ao mesmo tempo.
+
+SEUS ESTUDOS
+Os dados ficam no armazenamento do navegador, vinculado ao perfil e a
+http://127.0.0.1:1420/. A pasta do programa pode mudar sem alterar esse
+endereço. Evite modo anônimo e não limpe os dados desse endereço.
+Para transferir os estudos a outro perfil ou navegador, exporte um backup
+e importe-o na biblioteca vazia do destino. A versão nativa Tauri mantém
+seu próprio banco; use o backup para transferir os estudos entre elas.
+Esta versão protege a atualização do banco com uma cópia de recuperação.
+
+ESTUDO LOCAL E JARVIS
+As funções de estudo funcionam sem IA e sem internet. APIs de IA exigem
+conexão e conta no provedor escolhido. Ollama e LM Studio usam seus
+servidores locais. Os 15 provedores existentes continuam disponíveis.
+O servidor escuta somente 127.0.0.1, sem publicar o aplicativo na rede.
+
+O pacote traz apenas o modelo config\.env.example, sem chaves privadas.
+Para usar IA, faça uma cópia dele com o nome .env na mesma pasta e siga
+config\COMO-CONFIGURAR.txt. Não compartilhe seu .env. A seleção de modelo
+e provedor fica no painel do JARVIS. O estudo não depende dessa configuração.
+
+COMO ENCERRAR
+Fechar a aba ou a janela de abertura não encerra o servidor.
+Espere as edições serem salvas e abra "Encerrar StudySpace.cmd".
+Se a porta 1420 pertencer a outro programa, o iniciador avisará; ele não
+encerra programas de terceiros. O endereço fixo preserva o acesso aos dados.
+
+INTEGRIDADE E LICENÇAS
+MANIFEST-SHA256.txt lista o SHA256 de cada arquivo distribuído, exceto
+o próprio manifesto. SHA256SUMS.txt, publicado junto do ZIP, contém o hash
+do arquivo ZIP completo. Compare esses valores com o release oficial.
+As licenças do Node e dos componentes estão na pasta runtime.
+
+Para verificar o ZIP no PowerShell:
+Get-FileHash -Algorithm SHA256 -LiteralPath .\StudySpace_{{VERSION}}_windows-x64-local.zip
+
+Erros de abertura ficam em %LOCALAPPDATA%\StudySpace-Local\iniciador.log.

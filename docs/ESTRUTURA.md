@@ -1,5 +1,7 @@
 # Estrutura do StudySpace
 
+> Mapa histórico das missões anteriores, com referências a arquivos e resultados de outro ambiente. Para o estado verificado em 18/10/2026 e a evolução planejada, consulte [StudySpace 3.0 — Missão 0](studyspace-3/README.md). O código e o README atuais prevalecem sobre as afirmações históricas abaixo.
+
 O frontend aprovado permanece em `src/` e `public/`. A organização agrupa ferramentas de desktop, verificação e documentos sem mover componentes, alterar o schema ou tocar nos estudos salvos.
 
 ```text

@@ -1,0 +1,119 @@
+{
+  "format": "studyspace-backup",
+  "version": 2,
+  "exportedAt": "2026-10-18T12:00:00.000Z",
+  "data": {
+    "subjects": [
+      {
+        "id": "parity-subject",
+        "name": "Biologia — células 🧠",
+        "accent": "green",
+        "createdAt": "2026-10-18T12:00:00.000Z",
+        "updatedAt": "2026-10-18T12:00:00.000Z"
+      }
+    ],
+    "notes": [
+      {
+        "id": "parity-note",
+        "subjectId": "parity-subject",
+        "title": "Membranas, ação e função",
+        "bodyJson": {
+          "type": "doc",
+          "content": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Ação e memória 🧠: pré-requisitos sem perder dados."
+                }
+              ]
+            }
+          ]
+        },
+        "plainText": "Ação e memória 🧠: pré-requisitos sem perder dados.",
+        "revision": 7,
+        "createdAt": "2026-10-18T12:00:00.000Z",
+        "updatedAt": "2026-10-18T12:00:00.000Z"
+      }
+    ],
+    "flashcards": [
+      {
+        "id": "parity-card",
+        "subjectId": "parity-subject",
+        "noteId": "parity-note",
+        "front": "Qual a função da membrana? 🧠",
+        "back": "Regular a passagem de substâncias.",
+        "createdAt": "2026-10-18T12:00:00.000Z",
+        "updatedAt": "2026-10-18T12:00:00.000Z"
+      }
+    ],
+    "reviewLogs": [
+      {
+        "id": "parity-review",
+        "flashcardId": "parity-card",
+        "sessionId": "parity-session",
+        "rating": 3,
+        "reviewedAt": "2026-10-18T12:00:00.000Z"
+      }
+    ],
+    "settings": {
+      "theme": "dark"
+    },
+    "documents": [
+      {
+        "id": "parity-document",
+        "subjectId": "parity-subject",
+        "noteId": "parity-note",
+        "fileName": "células — revisão.txt",
+        "kind": "txt",
+        "mimeType": "text/plain",
+        "sha256": "26c9800505f004161b9556ec21bc6302c550d648d16e85c2478100fab3b8b548",
+        "pageCount": 2,
+        "createdAt": "2026-10-18T12:00:00.000Z"
+      }
+    ],
+    "cardMetadata": [
+      {
+        "flashcardId": "parity-card",
+        "tags": [
+          "biologia",
+          "revisão 🧠"
+        ],
+        "images": [
+          {
+            "assetHash": "bb600356abcf4624f6cb95aa38e317bc9d10659ae2fc797c90d23e67462222dd",
+            "side": "front",
+            "alt": "Diagrama sintético — célula"
+          }
+        ]
+      }
+    ]
+  },
+  "materials": {
+    "documents": [
+      {
+        "documentId": "parity-document",
+        "dataBase64": "UmV2aXPDo28gZGUgY8OpbHVsYXMg8J+noApBIG1lbWJyYW5hIHByZXNlcnZhIG8gZXF1aWzDrWJyaW8uClDDoWdpbmEgMjogYcOnw6NvLCBmdW7Dp8OjbyBlIHByw6ktcmVxdWlzaXRvcy4=",
+        "pages": [
+          {
+            "page": 1,
+            "text": "Revisão de células 🧠\nA membrana preserva o equilíbrio."
+          },
+          {
+            "page": 2,
+            "text": "Ação, função e pré-requisitos."
+          }
+        ]
+      }
+    ],
+    "assets": [
+      {
+        "sha256": "bb600356abcf4624f6cb95aa38e317bc9d10659ae2fc797c90d23e67462222dd",
+        "fileName": "diagrama-célula.png",
+        "mimeType": "image/png",
+        "dataBase64": "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+aNT0AAAAASUVORK5CYII="
+      }
+    ]
+  }
+}

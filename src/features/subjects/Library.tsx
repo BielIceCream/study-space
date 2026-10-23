@@ -1,9 +1,12 @@
-import { ArrowRight, ArrowUpRight, BookOpen, Check, FileText, Layers2, Plus, Sprout, Sparkles, Clock3 } from 'lucide-react';
+import { ArrowRight, ArrowUpRight, BookOpen, Check, FileText, Layers2, Plus, Route, Sprout, Sparkles, Clock3 } from 'lucide-react';
 import type { Note, Snapshot, Subject } from '../../shared/types';
 import { isToday, plural, shortDate } from '../../shared/utils';
+import { TodayCard } from '../planner/TodayCard';
+import type { SaveStudyPlannerInput, StudyPlanner } from '../../domain/planner/types';
 
-export function Library({ data, onCreateSubject, onOpenSubject, onOpenNote, onReview }: {
-  data: Snapshot; onCreateSubject: () => void; onOpenSubject: (subject: Subject) => void; onOpenNote: (note: Note) => void; onReview: () => void;
+export function Library({ data, onCreateSubject, onOpenSubject, onOpenNote, onReview, onStudy, onPlanner, onSavePlanner }: {
+  data: Snapshot; onCreateSubject: () => void; onOpenSubject: (subject: Subject) => void; onOpenNote: (note: Note) => void; onReview: () => void; onStudy: () => void;
+  onPlanner: (trackId?: string) => void; onSavePlanner: (input: SaveStudyPlannerInput) => Promise<StudyPlanner>;
 }) {
   const recent = [...data.notes].sort((a, b) => b.updatedAt.localeCompare(a.updatedAt)).slice(0, 4);
   const todayReviews = data.reviewLogs.filter(log => isToday(log.reviewedAt)).length;
@@ -14,6 +17,8 @@ export function Library({ data, onCreateSubject, onOpenSubject, onOpenNote, onRe
       <div className="study-illustration" aria-hidden="true"><div className="orbit orbit-one" /><div className="orbit orbit-two" /><div className="illus-spark one">✧</div><div className="illus-spark two">✧</div><div className="illus-dot" /><div className="illus-card back"><span /><span /><span /></div><div className="illus-card front"><div className="illus-book"><BookOpen size={35} strokeWidth={1.35} /></div><div className="illus-line long" /><div className="illus-line" /><div className="illus-line short" /></div><div className="illus-badge"><Check size={18} /></div><div className="illus-leaf"><Sprout size={38} strokeWidth={1.3} /></div></div>
     </section>
     <div className="library-facts"><div><span className="fact-icon lavender"><BookOpen size={18} /></span><strong>{data.subjects.length}</strong><span>{data.subjects.length === 1 ? 'matéria no seu espaço' : 'matérias no seu espaço'}</span></div><div><span className="fact-icon blue"><Layers2 size={18} /></span><strong>{data.flashcards.length}</strong><span>{data.flashcards.length === 1 ? 'cartão para praticar' : 'cartões para praticar'}</span></div><div><span className="fact-icon green"><Check size={18} /></span><strong>{todayReviews}</strong><span>{todayReviews === 1 ? 'revisão hoje' : 'revisões hoje'}</span></div></div>
+    <TodayCard data={data} onPlanner={onPlanner} onSave={onSavePlanner} />
+    <section className="library-track-callout"><div className="study-icon"><Route size={23} /></div><div><h2>{data.studyTracks?.length ? 'Sua trilha está pronta para continuar' : 'Um caminho para o seu próximo objetivo'}</h2><p>Trilha ENEM demonstrativa, preferências de estudo e diagnóstico opcional. Tudo funciona sem IA.</p></div><button className="button soft" onClick={onStudy}>{data.studyTracks?.length ? 'Continuar minha trilha' : 'Conhecer as trilhas'}<ArrowRight size={16} /></button></section>
     <section className="subjects-section"><div className="section-heading"><h2>Suas matérias <span className="count-badge">{data.subjects.length}</span></h2><span className="section-hint">Um lugar para cada curiosidade</span></div>
       <div className="subject-grid">{data.subjects.map(subject => {
         const notes = data.notes.filter(note => note.subjectId === subject.id).length;

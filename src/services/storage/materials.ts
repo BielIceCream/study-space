@@ -49,9 +49,12 @@ export function backupMaterials(db:Database):BackupMaterials {
 }
 export async function insertAsset(db:Database,asset:ImportedAsset):Promise<void> {
   const bytes=await decodeMaterial(asset.dataBase64,asset.sha256,8*1024*1024);
-  const hex=Array.from(bytes.subarray(0,12)).map(b=>b.toString(16).padStart(2,'0')).join('');
-  if (!(asset.mimeType==='image/png'&&hex.startsWith('89504e470d0a1a0a') || asset.mimeType==='image/jpeg'&&hex.startsWith('ffd8ff') || asset.mimeType==='image/gif'&&hex.startsWith('47494638') || asset.mimeType==='image/webp'&&hex.startsWith('52494646')&&hex.slice(16,24)==='57454250' || asset.mimeType==='image/bmp'&&bytes.length>=54&&hex.startsWith('424d'))) throw new Error('O formato da imagem não confere com seu conteúdo.');
+  validateAssetContent(bytes,asset.mimeType);
   db.run('INSERT OR IGNORE INTO material_assets VALUES (?,?,?,?)',[asset.sha256,asset.fileName,asset.mimeType,bytes]);
+}
+export function validateAssetContent(bytes:Uint8Array,mimeType:string):void {
+  const hex=Array.from(bytes.subarray(0,12)).map(b=>b.toString(16).padStart(2,'0')).join('');
+  if (!(mimeType==='image/png'&&hex.startsWith('89504e470d0a1a0a') || mimeType==='image/jpeg'&&hex.startsWith('ffd8ff') || mimeType==='image/gif'&&hex.startsWith('47494638') || mimeType==='image/webp'&&hex.startsWith('52494646')&&hex.slice(16,24)==='57454250' || mimeType==='image/bmp'&&bytes.length>=54&&hex.startsWith('424d'))) throw new Error('O formato da imagem não confere com seu conteúdo.');
 }
 export async function importSQLiteBatch(db:Database,input:ImportBatchInput,time:string,newId:()=>string):Promise<ImportResult> {
   const batch=validate(importBatchSchema,input);

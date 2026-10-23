@@ -110,6 +110,14 @@ pub struct Snapshot {
     pub documents: Vec<crate::materials::DocumentMetadata>,
     #[serde(default)]
     pub card_metadata: Vec<crate::materials::CardMetadata>,
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub study_tracks: Vec<crate::study::StudyTrack>,
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub study_planners: Vec<crate::planner::StudyPlanner>,
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub review_schedules: Vec<crate::review_schedule::ReviewSchedule>,
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub error_entries: Vec<crate::error_notebook::ErrorEntry>,
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
@@ -167,8 +175,20 @@ pub struct UpdateFlashcardInput {
 
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase", deny_unknown_fields)]
+pub struct ReviewAdmission {
+    pub new_card_limit: u8,
+    pub day_start: String,
+    pub day_end: String,
+}
+
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
 pub struct ReviewInput {
     pub flashcard_id: String,
     pub session_id: String,
     pub rating: u8,
+    #[serde(default)]
+    pub schedule: bool,
+    #[serde(default)]
+    pub admission: Option<ReviewAdmission>,
 }

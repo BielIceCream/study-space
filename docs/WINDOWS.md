@@ -1,5 +1,7 @@
 # StudySpace Windows — missões 2.2, 2.3 e 2.3.1
 
+> Registro histórico de outro ambiente. Afirmações sobre ferramentas instaladas, executáveis, caminhos e resultados desta sessão não foram revalidadas pela Missão 0. A distribuição atual está no [README](../README.md); diferenças entre runtime local e Tauri e próximos passos estão em [StudySpace 3.0](studyspace-3/README.md).
+
 ## Situação da entrega
 
 O projeto existente continua com **React + TypeScript + Tauri 2 + WebView2**. A interface aprovada foi preservada. O empacotamento NSIS, a distribuição sem instalação, os locks de dependências e o workflow Windows estão preparados.

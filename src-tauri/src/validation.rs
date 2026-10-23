@@ -89,7 +89,7 @@ impl Write for SizeLimit {
     }
 }
 
-pub(crate) fn json_size<T: Serialize>(value: &T, max: usize, label: &str) -> StoreResult<()> {
+pub(crate) fn json_size<T: Serialize>(value: &T, max: usize, label: &str) -> StoreResult<usize> {
     // Count streamed bytes without allocating a second, potentially very large document.
     let mut counter = SizeLimit { size: 0, max, exceeded: false };
     if let Err(error) = serde_json::to_writer(&mut counter, value) {
@@ -98,7 +98,7 @@ pub(crate) fn json_size<T: Serialize>(value: &T, max: usize, label: &str) -> Sto
         }
         return Err(error.into());
     }
-    Ok(())
+    Ok(counter.size)
 }
 
 pub fn document(value: &Value) -> StoreResult<()> {
@@ -178,15 +178,30 @@ pub fn backup(value: &BackupDocument) -> StoreResult<()> {
     if value.format != "studyspace-backup" || !matches!(value.version,1|2) {
         return Err(invalid("Este arquivo não é um backup StudySpace compatível (versões 1 e 2)."));
     }
+    if !value.data.error_entries.is_empty() {
+        return Err(invalid("O caderno de erros exige um arquivo .studyspace da versão 7. Exporte o backup portátil para preservar esses dados."));
+    }
+    if !value.data.review_schedules.is_empty() {
+        return Err(invalid("A agenda de revisão exige um arquivo .studyspace da versão 6. Exporte o backup portátil para preservar esses dados."));
+    }
+    if !value.data.study_planners.is_empty() {
+        return Err(invalid("A agenda exige um arquivo .studyspace da versão 5. Exporte o backup portátil para preservar esses dados."));
+    }
+    if !value.data.study_tracks.is_empty() {
+        return Err(invalid("Trilhas e diagnósticos exigem um arquivo .studyspace da versão 4. Exporte o backup de arquivo para preservar esses dados."));
+    }
     date(&value.exported_at)?;
-    let data = &value.data;
+    json_size(value, MAX_BACKUP_BYTES, "O backup")?;
+    crate::materials::validate_backup(value)?;
+    snapshot(&value.data)
+}
+
+pub(crate) fn snapshot(data: &crate::models::Snapshot) -> StoreResult<()> {
     if data.subjects.len() > 10_000 || data.notes.len() > 50_000
         || data.flashcards.len() > 200_000 || data.review_logs.len() > 1_000_000
     {
         return Err(invalid("O backup contém mais registros do que o limite permitido."));
     }
-    json_size(value, MAX_BACKUP_BYTES, "O backup")?;
-    crate::materials::validate_backup(value)?;
 
     let mut subjects = HashSet::new();
     for subject in &data.subjects {
@@ -253,5 +268,8 @@ pub fn backup(value: &BackupDocument) -> StoreResult<()> {
             return Err(invalid("O backup contém revisões duplicadas."));
         }
     }
-    Ok(())
+    crate::study::validate_tracks(data)?;
+    crate::planner::validate_planners(data)?;
+    crate::review_schedule::validate_schedules(data)?;
+    crate::error_notebook::validate_entries(data)
 }
